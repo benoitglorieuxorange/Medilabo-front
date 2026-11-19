@@ -1,0 +1,115 @@
+<section class="case-component">
+  <h2>Dossiers enregistrés</h2>
+
+  @if (errorMessage()) {
+    <p class="error" role="alert">{{ errorMessage() }}</p>
+  }
+  @if (successMessage()) {
+    <p class="success" role="status">{{ successMessage() }}</p>
+  }
+
+  <div class="table-wrapper">
+    <table>
+      <caption class="sr-only">Historique des dossiers enregistrés</caption>
+      <thead>
+        <tr>
+          <th scope="col">Prénom</th>
+          <th scope="col">Nom</th>
+          <th scope="col">Date de naissance</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of caseList(); track p.id) {
+          <tr>
+            <td>{{ p.firstName }}</td>
+            <td>{{ p.lastName }}</td>
+            <td>{{ p.dateNaissance | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <button type="button" class="btn-admin" (click)="editCase(p)">Modifier</button>
+              @if (isAdmin) {
+                <button type="button" class="btn-admin" (click)="archiveCase(p)">
+                  Archiver
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">Aucun dossier enregistré.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="form-container">
+  <h3>{{ isEditing() ? 'Modifier le dossier' : 'Nouveau dossier' }}</h3>
+
+  <form [formGroup]="caseForm" (ngSubmit)="submitForm()">
+    <div>
+      <label for="firstName">Prénom</label>
+      <input id="firstName" type="text" formControlName="firstName" />
+      @if (caseForm.controls.firstName.touched && caseForm.controls.firstName.invalid) {
+        <small class="error">Le prénom est obligatoire.</small>
+      }
+    </div>
+
+    <div>
+      <label for="lastName">Nom de famille</label>
+      <input id="lastName" type="text" formControlName="lastName" />
+    </div>
+
+    <div>
+      <label for="dateNaissance">Date de naissance</label>
+      <input id="dateNaissance" type="date" formControlName="dateNaissance" />
+    </div>
+
+    <div>
+      <label for="sexe">Sexe</label>
+      <select id="sexe" formControlName="sexe">
+        <option value="">Sélectionner</option>
+        <option value="M">Masculin</option>
+        <option value="F">Féminin</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="phoneNumber">Numéro de téléphone</label>
+      <input id="phoneNumber" type="tel" formControlName="phoneNumber" />
+    </div>
+
+    <fieldset formGroupName="adresse">
+      <legend>Adresse</legend>
+
+      <label for="numero">Numéro</label>
+      <input id="numero" type="text" inputmode="numeric" formControlName="numero" />
+
+      <label for="line1">Adresse ligne 1</label>
+      <input id="line1" type="text" formControlName="line1" />
+
+      <label for="line2">Adresse ligne 2</label>
+      <input id="line2" type="text" formControlName="line2" />
+
+      <label for="ville">Ville</label>
+      <input id="ville" type="text" formControlName="ville" />
+
+      <label for="codePostal">Code postal</label>
+      <input id="codePostal" type="text" formControlName="codePostal" />
+
+      <label for="pays">Pays</label>
+      <input id="pays" type="text" formControlName="pays" />
+    </fieldset>
+
+    <div>
+      <button type="submit" [disabled]="caseForm.invalid">
+        {{ isEditing() ? 'Enregistrer les modifications' : 'Créer le dossier' }}
+      </button>
+
+      @if (isEditing()) {
+        <button type="button" (click)="resetForm()">Annuler</button>
+      }
+    </div>
+  </form>
+</section>
